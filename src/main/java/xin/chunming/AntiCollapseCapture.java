@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AntiCollapseCapture {
     static AtomicInteger ai = new AtomicInteger(0);
-    static final String TARGET_URL = "https://read.wqyunpan.com/qrcode/1246251?fileId=528759&codeId=440847&type=kz";
+    static final String TARGET_URL = "https://read.wqyunpan.com/qrcode/89152?fileId=199087&codeId=172624&type=kz";
     static final String CAPTURE_HOST = "x1.ow365.cn"; // 替换为目标 host
     static String TOKEN; // 替换为目标 host
     static ObjectMapper om = new ObjectMapper();
@@ -116,8 +116,52 @@ public class AntiCollapseCapture {
                             JsonNode jsonNode = om.readTree(body);
                             JsonNode jsonNode1 = jsonNode.get("data").get("url");
                             if (jsonNode1 != null) {
-                                System.out.println("Video OK!");
-                                downloadVideo(jsonNode1.asText(), new File("output" + File.separator + ai + "_" + UUID.randomUUID()+".mp4"), false);
+                                System.out.println(" OK!");
+                                String urlfile = jsonNode1.asText();
+                                String name = "";
+                                boolean ispdf= false;//ispdf应为isfile 控制是否带token 下载文件需token 视频不用
+                                if (urlfile.contains(".mp4")) {
+                                    name = "mp4";
+                                }
+                                if (urlfile.contains(".pdf")) {
+                                    name = ".pdf";
+                                    ispdf=true;
+                                    urlfile=urlfile.split("url=")[1];
+                                }
+                                if (urlfile.contains(".doc")) {
+                                    name = ".doc";
+                                    ispdf=true;
+                                    urlfile=urlfile.split("url=")[1];
+
+
+                                }
+                                if (urlfile.contains(".ppt")) {
+                                    name = ".ppt";
+                                    ispdf=true;
+                                    urlfile=urlfile.split("url=")[1];
+
+
+                                }
+                                if (urlfile.contains(".xls")) {
+                                    name = ".xls";
+                                    ispdf=true;
+                                    urlfile=urlfile.split("url=")[1];
+
+
+                                }if (urlfile.contains(".rar")) {
+                                    name = ".rar";
+                                    ispdf=true;
+                                    urlfile=urlfile.split("url=")[1];
+
+
+                                }if (urlfile.contains(".zip")) {
+                                    name = ".zip";
+                                    ispdf=true;
+                                    urlfile=urlfile.split("url=")[1];
+
+
+                                }
+                                downloadVideo(urlfile, new File("output" + File.separator + ai + "_" + UUID.randomUUID() + name), ispdf);
                                 ai.incrementAndGet();
                             }
 
@@ -138,17 +182,17 @@ public class AntiCollapseCapture {
                     System.out.println("[API REQ] " + url);
                     return;
                 }
-                if (url.contains("x1.ow365.cn/pdfv/f?f")) {
-                    System.out.println("[CAPTURED] " + url);
-                    try {
-                        downloadVideo(url, new File("output" + File.separator + ai + "_" + UUID.randomUUID()+".pdf"), true);
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new RuntimeException(e);
-                    } catch (KeyManagementException e) {
-                        throw new RuntimeException(e);
-                    }
-                    ai.incrementAndGet();
-                }
+//                if (url.contains("x1.ow365.cn/pdfv/f?f")) {
+//                    System.out.println("[CAPTURED] " + url);
+//                    try {
+//                        downloadVideo(url, new File("output" + File.separator + ai + "_" + UUID.randomUUID()+".pdf"), true);
+//                    } catch (NoSuchAlgorithmException e) {
+//                        throw new RuntimeException(e);
+//                    } catch (KeyManagementException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    ai.incrementAndGet();
+//                }
 //                if (url.contains("vod")) {
 //                    System.out.println("[CAPTURED] " + url);
 //                    downloadVideo(url, new File("output" + File.separator + ai + "_" + UUID.randomUUID()), false);
@@ -165,7 +209,8 @@ public class AntiCollapseCapture {
             // 外层查 ant-collapse-item
             List<ElementHandle> outerItems = page.querySelectorAll(".ant-collapse-item");
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < outerItems.size(); i++) {
+//                Thread.sleep(50000);
                 List<ElementHandle> outerRefreshed = page.querySelectorAll(".ant-collapse-item");
                 if (i >= outerRefreshed.size()) break;
                 ElementHandle outerItem = outerRefreshed.get(i);
